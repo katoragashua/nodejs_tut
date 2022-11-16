@@ -19,3 +19,34 @@ const server = http.createServer((req, res) => {
 });
 
 server.listen(3000);
+
+
+const http = require("http");
+
+console.time();
+const server = http.createServer((req, res) => {
+  console.log("Request event");
+  switch (req.url) {
+    case "/":
+      res.write("Welcome to my application server Home page!");
+      res.end();
+      break;
+    case "/users":
+      res.write("Welcome to my application server Users page!");
+      res.end();
+      break;
+    case "/groups":
+      res.write("Welcome to my application server Groups!");
+      res.end();
+      break;
+    default:
+      res.write("Cant find the specified path on server!");
+      res.end();
+  }
+});
+
+// server.listen(8080);
+// We can also add a callback to the listen method
+server.listen(8080, () => {
+  console.log("Server listening on port 8080");
+});

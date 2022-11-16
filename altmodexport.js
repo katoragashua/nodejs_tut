@@ -1,3 +1,5 @@
+// Here is an alternative of how to export a module
+
 module.exports.myObject = {
     firstName: "Kator",
     lastName: "Agashua"
