@@ -8,7 +8,7 @@ These are default modules built into node js
 For now we will cover these four built in modules. OS, PATH, FS and HTTP. These modules provide many properties and methods for interactivity in node.
 
 OS(Operating System)
-The provides properties and methods for interacting with the server and operating system
+This module provides properties and methods for interacting with the server and operating system
 */
 
 const os = require("os");

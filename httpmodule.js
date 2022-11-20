@@ -1,29 +1,31 @@
 const http = require("http");
 
-const server = http.createServer((req, res) => {
-  if (req.url === "/") {
-    res.write("Welcome to the Home page.");
-    res.end();
-  }
-  if (req.url === "/about") {
-    res.write("Welcome to the About page. Here is a brief history about us.");
-    res.end();
-  }
+// const server = http.createServer((req, res) => {
+//   if (req.url === "/") {
+//     res.write("Welcome to the Home page.");
+//     res.end();
+//   }
+//   if (req.url === "/about") {
+//     res.write("Welcome to the About page. Here is a brief history about us.");
+//     res.end();
+//   }
 
-  if (req.url === "/contact") {
-    res.write("Contact us at 09090904546");
-    res.end();
-  }
+//   if (req.url === "/contact") {
+//     res.write("Contact us at 09090904546");
+//     res.end();
+//   }
 
-  res.end(`<h2>Page not found</h2>`);
-});
+//   res.end(`<h2>Page not found</h2>`);
+// });
 
-server.listen(3000);
+// server.listen(3000);
 
 
-const http = require("http");
+// const http = require("http");
 
-console.time();
+// console.time();
+
+
 const server = http.createServer((req, res) => {
   console.log("Request event");
   switch (req.url) {
@@ -50,3 +52,19 @@ const server = http.createServer((req, res) => {
 server.listen(8080, () => {
   console.log("Server listening on port 8080");
 });
+
+/*
+Please do note that the server extends the net.server class which in turn extends the EventEmmitter class as so has access to methods on the parent class. As seen below, we can also create a server as such
+*/
+
+// const {createServer} = require("http");
+// const server = createServer()
+
+// server.on("request", (req, res) => {
+//   res.write("Hello, world!");
+//   res.end();
+// });
+
+// server.listen(5000, ()=> {
+//   console.log("Listening on port 5000")
+// })
