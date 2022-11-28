@@ -64,12 +64,40 @@ const express = require("express");
 const { products, people } = require("./data");
 const app = express();
 
-app.use(express.static("./methods-public"))
+// Middlewares for traditional approach
+app.use(express.static("./methods-public"));
+app.use(express.urlencoded({ extended: false }));
+
+// Middleware for javascript approach
+app.use(express.json()); // Adding this middleware gives you access to the incoming request body.
 
 app.get("/api/people", (req, res) => {
-  res.status(200).json({ success: true, data: people});
-})
+  res.status(200).json({ success: true, data: people });
+});
 
-app.listen(5500, () => {
-  console.log("Server listening on port 5500");
-})
+// Functionality for JavaScript approach
+app.post("/api/people", (req, res) => {
+  console.log(req.body);
+  const { name } = req.body;
+  if (!name.trim()) {
+    return res
+      .status(400)
+      .json({ success: false, msg: "Please enter a name." });
+  }
+  res.status(200).json({ success: true, person: name });
+});
+
+// Functionality for Traditional approach
+app.post("/login", (req, res) => {
+  // Note that if your server is hosted somewhere else, you will have to provide a link for its. However, for this we use /login since its hosted here. Same thing will apply in the HTML.
+  console.log(req.body);
+  const { name } = req.body;
+  if (name.trim()) {
+    return res.status(200).send(`<h1>Welcome, ${name}</h1>`);
+  }
+  res.status(401).send("<h1>Please enter your credentials</h1>");
+});
+
+app.listen(5000, () => {
+  console.log("Server listening on port 5000");
+});
