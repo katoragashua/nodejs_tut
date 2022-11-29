@@ -87,6 +87,17 @@ app.post("/api/people", (req, res) => {
   res.status(200).json({ success: true, person: name });
 });
 
+app.post("/api/postman/people", (req, res) => {
+  const { name } = req.body;
+  if (name.trim()) {
+    return res.status(200).json({
+      success: true,
+      data: [...people, { id: people.length + 1, name: name }],
+    });
+  }
+  res.status(401).json({ success: false, msg: "Enter a name" });
+});
+
 // Functionality for Traditional approach
 app.post("/login", (req, res) => {
   // Note that if your server is hosted somewhere else, you will have to provide a link for its. However, for this we use /login since its hosted here. Same thing will apply in the HTML.
@@ -96,6 +107,46 @@ app.post("/login", (req, res) => {
     return res.status(200).send(`<h1>Welcome, ${name}</h1>`);
   }
   res.status(401).send("<h1>Please enter your credentials</h1>");
+});
+
+// PUT request
+app.put("/api/people/:id", (req, res) => {
+  const { id } = req.params;
+  const { name } = req.body;
+  const person = people.find((per) => per.id === Number(id));
+
+  if (!person) {
+    return res
+      .status(404)
+      .json({ success: false, msg: "Please enter a valid id" });
+  }
+
+  const newPeople = people.map((person) => {
+    if (person.id === Number(id)) {
+      return { ...person, name: name };
+    }
+    return person;
+  });
+
+  if (!name.trim()) {
+    return res.status(401).json({ success: false, msg: "Please enter a name" });
+  }
+  res.status(200).json({ success: true, data: newPeople });
+});
+
+// Delete request
+app.delete("/api/people/:id", (req, res) => {
+  const { id } = req.params;
+  const person = people.find((p) => p.id === Number(id));
+
+  if (!person) {
+    return res
+      .status(404)
+      .json({ success: false, msg: "Person does not exist." });
+  }
+
+  const newPeople = people.filter((person) => person.id !== Number(id));
+  res.status(200).json({ success: true, data: newPeople });
 });
 
 app.listen(5000, () => {
