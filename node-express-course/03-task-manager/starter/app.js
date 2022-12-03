@@ -3,8 +3,8 @@ const app = express();
 const tasks = require("./routes/tasks");
 const connectDB = require("./db/connection");
 const mongoose = require("mongoose");
-const {config} = require("dotenv")
-config()
+const { config } = require("dotenv");
+config();
 // require("dotenv").config();
 
 app.use(express.json());
@@ -16,7 +16,9 @@ app.use("/api/v1/tasks", tasks);
 const port = 3000;
 const start = async () => {
   try {
-    await mongoose.connect(process.env.MONGO_URI);
+    await connectDB(process.env.MONGO_URI);
+    // or
+    // await mongoose.connect(process.env.MONGO_URI)
     app.listen(port, () => {
       console.log(`Server listening on port ${port}`);
     });

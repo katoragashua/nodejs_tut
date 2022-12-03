@@ -1,0 +1,11 @@
+REST - Representational State Transfer: is a design pattern that combines the use of HTTP verbs, Routes and the resources(data) to create an HTTP interface(i.e., API). It is important to note that it is a pattern and not a strictly enforced list of rules.
+
+E.g, 
+Method        Route                What it does
+GET           api/tasks            Gets all tasks
+POST          api/tasks            Posts/Creates a new task
+GET           api/tasks/:id        Gets a specific task
+PUT/PATCH     api/tasks/:id        Updates a specific task
+DELETE        api/tasks/:id        Deletes a specific task 
+
+JSON is probably the standard for sending and recieving data.
