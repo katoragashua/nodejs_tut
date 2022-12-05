@@ -5,15 +5,18 @@ const connectDB = require("./db/connection");
 const mongoose = require("mongoose");
 const { config } = require("dotenv");
 config();
+// or
 // require("dotenv").config();
+const notFound = require("./middleware/notFound");
+const errorHandlerMiddleware = require("./middleware/errorHandler");
 
+app.use(express.static("./public"));
 app.use(express.json());
-// app.get("/hello", (req, res) => {
-//     res.status(200).json({status: 200, statusText: "OK", message: "Welcome to our Task Manager App"})
-// })
 app.use("/api/v1/tasks", tasks);
+app.use(notFound);
+app.use(errorHandlerMiddleware);
 
-const port = 3000;
+const port = process.env.PORT || 3000;
 const start = async () => {
   try {
     await connectDB(process.env.MONGO_URI);
