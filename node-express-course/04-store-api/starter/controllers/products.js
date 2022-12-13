@@ -2,7 +2,7 @@ const Products = require("../models/product");
 
 const findAll = async (req, res) => {
   try {
-    const { featured, rating, company, name, sort } = req.query;
+    const { featured, rating, company, name, sort,fields, per_page, skip } = req.query;
     const queryObj = {};
 
     if (featured) {
@@ -22,10 +22,23 @@ const findAll = async (req, res) => {
     let result = Products.find(queryObj);
     if(sort){
       const sortList = sort.split(',').join(' ');
-      result = result.sort()
+      result = result.sort(sortList)
     }
+    if(fields){
+      const fieldsList = fields.split(',').join(' ');
+      result = result.select(fieldsList)
+    }
+
+    if(per_page) {
+      result = result.limit(per_page)
+    }
+
+    if (skip) {
+      result = result.skip(skip);
+    }
+
     const products = await result
-    res.status(200).json({ status: "success", products: products });
+    res.status(200).json({ status: "success",nbHits: products.length, products });
   } catch (err) {
     res.status(500).json({ status: "unsuccessful" });
   }
