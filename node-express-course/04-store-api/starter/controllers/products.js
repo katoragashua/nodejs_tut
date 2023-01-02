@@ -1,124 +1,100 @@
-const Products = require("../models/product");
+const AsyncWrapper = require("../middlewares/asyncWrapper");
+const Product = require("../models/product");
+const CustomAPIError = require("../middlewares/customErrorClass");
 
-const findAll = async (req, res) => {
-  try {
-    const { featured, rating, company, name, sort,fields, per_page, skip } = req.query;
-    const queryObj = {};
-
-    if (featured) {
-      queryObj.featured = featured === "true" ? true : false;
-    }
-    if (rating) {
-      queryObj.rating = Number(rating) 
-    }
-    if (company) {
-      queryObj.company = company
-    }
-    if (name) {
-      queryObj.name = {$regex: name, $options: "i"};
-    }
-    
-    console.log(queryObj)
-    let result = Products.find(queryObj);
-    if(sort){
-      const sortList = sort.split(',').join(' ');
-      result = result.sort(sortList)
-    }
-    if(fields){
-      const fieldsList = fields.split(',').join(' ');
-      result = result.select(fieldsList)
-    }
-
-    if(per_page) {
-      result = result.limit(per_page)
-    }
-
-    if (skip) {
-      result = result.skip(skip);
-    }
-
-    const products = await result
-    res.status(200).json({ status: "success",nbHits: products.length, products });
-  } catch (err) {
-    res.status(500).json({ status: "unsuccessful" });
+const getProducts = AsyncWrapper(async (req, res, next) => {
+  const {
+    name,
+    company,
+    featured,
+    price,
+    rating,
+    sort,
+    fields,
+    numeric_filters,
+  } = req.query;
+  const queryObj = {};
+  if (name) {
+    queryObj.name = { $regex: name, $options: "i" }; // "i" meaning ignore case sensitivity
   }
-};
-
-const findByQuery = async (req, res) => {
-  try {
-    console.log(req.query);
-    const products = await Products.find(req.query);
-    if (products.length < 0) {
-      return res.status(404).json({ message: "No featured products" });
-    }
-    res.status(200).json({ products: products });
-  } catch (error) {
-    res.status(500).json({ status: "Internal Server Error" });
+  if (company) {
+    queryObj.company = company;
   }
-};
-
-const create = async (req, res) => {
-  try {
-    const product = await Products.create(req.body);
-    const products = await Products.find({});
-    res
-      .status(200)
-      .json({ status: "success", product: product, products: products });
-  } catch (err) {
-    res.status(500).json({ status: "unsuccessful" });
+  if (featured) {
+    queryObj.featured = featured === "true" ? true : false; // A ternary operator is used since the bolean value for featured in req.query is a string
   }
-};
-
-const findOne = async (req, res) => {
-  try {
-    const { id: productID } = req.params;
-    const product = await Products.findOne({ _id: productID });
-    if (!product) {
-      return res
-        .status(404)
-        .json({ status: "unsuccessful", message: "Product not found!" });
-    }
-    res.status(200).json({ status: "ok", product: product });
-  } catch (err) {
-    res.status(500).json({ status: "unsuccessfull" });
+  if (rating) {
+    queryObj.rating = { $lte: Number(rating) };
   }
-};
+  if (featured) {
+    queryObj.featured = featured === "true" ? true : false;
+  }
+  if (price) {
+    queryObj.price = { $lte: Number(price) };
+  }
+  console.log(queryObj);
 
-const findOneAndUpdate = async (req, res) => {
-  try {
-    const { id: productID } = req.params;
-    const product = await Products.findOneAndUpdate(
-      { _id: productID },
-      req.body,
-      { new: true, runValidators: true }
+  if (numeric_filters) {
+    const operatorMap = {
+      "<": "$lt",
+      "<=": "$lte",
+      ">": "$gt",
+      ">=": "$gte",
+      "=": "$eq",
+    };
+
+    const regEx = /\b(<|>|<=|=>|=)\b/g;
+    let filters = numeric_filters.replace(
+      regEx,
+      (match) => `-${operatorMap[match]}-`
     );
-    if (!product) {
-      return res
-        .status(404)
-        .json({ status: "unsuccessful", message: "Product not found!" });
-    }
-    const products = await Products.find({});
-    res
-      .status(200)
-      .json({ status: "ok", product: product, products: products });
-  } catch (err) {
-    res.status(500).json({ status: "unsuccessfull" });
+    const options = ["price", "rating"];
+    filters = filters.split(",").forEach((filter) => {
+      const [field, operator, value] = filter.split("-");
+      if (options.includes(field)) {
+        queryObj[field] = { [operator]: Number(value) };
+      }
+    });
+    console.log(queryObj);
   }
-};
 
-const findOneAndDelete = async (req, res) => {
-  try {
-    const { id: productID } = req.params;
-    const product = await Products.findOneAndDelete({ _id: productID });
-    if (!product) {
-      return res
-        .status(404)
-        .json({ status: "unsuccessful", message: "Product not found!" });
-    }
-    res.status(200).json({ status: "ok", product: product });
-  } catch (err) {
-    res.status(500).json({ status: "unsuccessfull" });
+  let results = Product.find(queryObj);
+
+  if (sort) {
+    const sortList = sort.split(",").join(" ");
+    results = Product.find(queryObj).sort(sortList);
+  } // Optionally you can add an else condition to sort based on time product was created.
+  // console.log(results);
+
+  // This is used to return only requested data fields
+  if (fields) {
+    const fieldsList = fields.split(",").join(" ");
+    results = Product.find(queryObj).select(fieldsList);
   }
-};
 
-module.exports = { findAll, create, findByQuery };
+  const per_page = Number(req.query.per_page) || 10;
+  const page = Number(req.query.page) || 1;
+  const skip = (page - 1) * per_page;
+  console.log(skip);
+  results = Product.find(queryObj).skip(skip).limit(per_page);
+
+  const products = await results;
+  // console.log(products);
+  res
+    .status(200)
+    .json({ status: "success", nbHits: products.length, products });
+});
+
+const getProductByID = AsyncWrapper(async (req, res, next) => {
+  const { id: taskID } = req.params;
+  const product = await Product.findOne({ _id: taskID });
+  if (!product) {
+    // throw new CustomAPIError(`There's no product with id ${taskID}`, 404) or
+    return next(
+      new CustomAPIError(`There's no product with id ${taskID}`, 404)
+    );
+  }
+  return res.status(200).json({ status: "success", product: product });
+});
+
+module.exports = { getProducts, getProductByID };
