@@ -20,3 +20,10 @@ require : a function to use modules(commonJS).
 module : info about a current module(file).
 process : info about the environment where the program is being executed.
 */
+require("./names")
+// console.log(__dirname);
+// console.log(__filename);
+// console.log(require);
+// console.log(module);
+// console.log(process);
+// console.log(process.env.COMPUTERNAME);

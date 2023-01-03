@@ -11,6 +11,8 @@ OS(Operating System)
 This module provides properties and methods for interacting with the server and operating system
 */
 
+// It is important to note that when you import a module, you actually invoke it.
+
 const os = require("os");
 
 // Method to get the user information
