@@ -16,28 +16,4 @@ console.log(fileContent);
 writeFileSync("../exampleFolder/second/altText.txt", `${fileContent} and I am a fullstack developer`, {flag: 'a'})
 
 
-// Asynchronous
-const { readFile, writeFile } = require("fs");
- readFile("./exampleFolder/second/text.txt", "utf-8", (err, result) => {
-  if(err) {
-    console.log(err);
-    return;
-  }
-  console.log(result);
-  const first = result 
-  readFile("./exampleFolder/second/altText.txt", "utf8", (err, result) => {
-    if(err) {
-      console.log(err);
-      return;
-    }
-    const second = result
-    writeFile("./exampleFolder/newFolderText.txt", `Combination of ${first} and ${second}`,{flag: "a"}, (err, result) => {
-      if(err) {
-        console.log(err);
-        return
-      }
-      console.log(result)
-      return result
-    })
-  })
- });
+
