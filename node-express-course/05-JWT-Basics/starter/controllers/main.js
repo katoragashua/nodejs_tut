@@ -1,4 +1,4 @@
-const CustomAPIError = require("../errors/custom-error");
+const {CustomAPIError, BadRequest, UnauthorizedRequest} = require("../errors/index");
 const jwt = require("jsonwebtoken");
 const { config } = require("dotenv");
 config();
@@ -6,7 +6,7 @@ config();
 const login = async (req, res) => {
   const { username, password } = req.body;
   if (!username.trim() || !password.trim()) {
-    throw new CustomAPIError("Invalid username or password", 400);
+    throw new BadRequest("Invalid username or password");
   }
 
   // We are using a dummy ID

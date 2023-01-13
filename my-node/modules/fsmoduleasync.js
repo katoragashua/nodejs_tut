@@ -1,6 +1,6 @@
 // Asynchronous
 /* This asynchronous method takes a callback as its last argument */
-const { readFile, writeFile } = require("fs");
+const { readFile, writeFile, existsSync, mkdir, rmdir, unlinkSync, unlink } = require("fs");
 const path = require("path");
 
 readFile(
@@ -48,3 +48,34 @@ readFile(
     });
   }
 );
+
+/* We can also create directories and remove them and also delete files. Examples Below */
+
+// We can check if a diectory or file already exists using the fs.existsSync() function. This is however synchronous
+
+if(existsSync("./text.txt" )) {
+  console.log("File already exists")
+}
+
+// Creating a folder
+if(!existsSync("./newFolder")) {
+  mkdir("./newFolder", (err) => {
+    console.log("Folder created");
+  })
+}
+
+// Deleting a folder
+if(existsSync("./newFolder")) {
+  rmdir("./newFolder", (err) => {
+    if(err) throw err
+    console.log("Folder deleted")
+  })
+}
+
+// Deleting files
+if(existsSync("./modules/text2.txt")){
+  unlink("./modules/text2.txt", (err) => {
+    if(err) throw err
+    console.log("File deleted");
+  })
+}

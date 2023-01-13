@@ -27,3 +27,4 @@ require("./names")
 // console.log(module);
 // console.log(process);
 // console.log(process.env.COMPUTERNAME);
+console.log(global)

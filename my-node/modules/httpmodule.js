@@ -63,7 +63,7 @@ server.listen(8080, () => {
 });
 
 /*
-Please do note that the server extends the net.server class which in turn extends the EventEmmitter class as so has access to methods on the parent class. As seen below, we can also create a server as such
+Please do note that the server extends the net.server class which in turn extends the EventEmmitter class and so has access to methods on the parent class. As seen below, we can also create a server as such
 */
 
 // const {createServer} = require("http");
@@ -77,3 +77,5 @@ Please do note that the server extends the net.server class which in turn extend
 // server.listen(5000, ()=> {
 //   console.log("Listening on port 5000")
 // })
+
+ 

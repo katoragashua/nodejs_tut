@@ -1,5 +1,9 @@
-const CustomAPIError = require("../errors/custom-error");
 const jwt = require("jsonwebtoken");
+const {
+  CustomAPIError,
+  BadRequest,
+  UnauthorizedRequest,
+} = require("../errors/index");
 
 // This middleware is created to handle authentication for varoius routes.
 const authMiddleware = async (req, res, next) => {
@@ -7,7 +11,7 @@ const authMiddleware = async (req, res, next) => {
   // console.log(authHeader);
 
   if (!authHeader || !authHeader.startsWith("Bearer ")) {
-    throw new CustomAPIError("Invalid authorization", 401);
+    throw new UnauthorizedRequest("Invalid authorization");
   }
 
   const token = authHeader.split(" ")[1];
@@ -20,7 +24,7 @@ const authMiddleware = async (req, res, next) => {
     // When next() is called it passes all req and res to a next middleware or function which may be route controllers.
     next();
   } catch (error) {
-    throw new CustomAPIError("Invalid authorization", 401);
+    throw new UnauthorizedRequest("Invalid authorization");
   }
 };
 
