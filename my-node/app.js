@@ -1,6 +1,7 @@
 const {createServer} = require("http");
 const {readFileSync, createReadStream} = require("fs")
 
+
 // const server = createServer((req, res) => {
 //   const file = readFileSync("exampleFolder/bigFile.txt", {encoding: "utf8"})
 //   res.end(file)
