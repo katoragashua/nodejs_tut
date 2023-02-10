@@ -15,6 +15,7 @@ const server = createServer();
 server.on("request", (req, res) => {
   const fileStream = createReadStream("./exampleFolder/bigFile.txt", "utf-8")
   fileStream.on("open", (data) => {
+    console.log(data)
     fileStream.pipe(res)
   })
   fileStream.on("error", (err) => {
