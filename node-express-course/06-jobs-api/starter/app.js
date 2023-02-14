@@ -1,20 +1,27 @@
-require('dotenv').config();
-require('express-async-errors');
-const express = require('express');
+require("dotenv").config();
+require("express-async-errors");
+const express = require("express");
 const app = express();
-const authRouter = require('./routes/auth')
-const jobsRouter = require('./routes/jobs')
+const authRouter = require("./routes/auth");
+const jobsRouter = require("./routes/jobs");
+const connectDB = require("./db/connect");
+const cookieParser = require("cookie-parser");
 
 // error handler
-const notFoundMiddleware = require('./middleware/not-found');
-const errorHandlerMiddleware = require('./middleware/error-handler');
+const notFoundMiddleware = require("./middleware/not-found");
+const errorHandlerMiddleware = require("./middleware/error-handler");
 
 app.use(express.json());
+app.use(cookieParser());
 // extra packages
 
+// Route Middlewares
+app.use("/domain/api/v1/jobs", jobsRouter);
+app.use("/domain/api/v1/auth", authRouter);
+
 // routes
-app.get('/', (req, res) => {
-  res.send('<h1>Jobs API</h1>');
+app.get("/", (req, res) => {
+  res.send("<h1>Jobs API</h1>");
 });
 
 app.use(notFoundMiddleware);
@@ -24,6 +31,7 @@ const port = process.env.PORT || 3000;
 
 const start = async () => {
   try {
+    await connectDB(process.env.MONGO_URI);
     app.listen(port, () =>
       console.log(`Server is listening on port ${port}...`)
     );
