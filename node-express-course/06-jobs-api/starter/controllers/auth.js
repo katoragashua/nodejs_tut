@@ -39,7 +39,8 @@ const login = async (req, res) => {
     if (!auth) {
       throw new Error("Please enter a valid password.");
     }
-    console.log(user); // compare password
+    console.log(user); 
+    // compare password
     const token = await createToken(user._id, user.name);
     res.status(StatusCodes.OK).json({ user, token });
   } catch (err) {

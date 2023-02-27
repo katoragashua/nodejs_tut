@@ -16,12 +16,13 @@ const JobSchema = new Schema(
     status: {
       type: String,
       enum: ["Interview", "Declined", "Pending"],
-      default: ["Pending"],
+      default: "Pending",
       maxlength: 50,
     },
     createdBy: {
-      type: mongoose.Types.ObjectId,
-      ref: "User",
+      // type: mongoose.Types.ObjectId,
+      type: String,
+      // ref: "User",
       required: [true, "Please provide a user."],
     },
   },

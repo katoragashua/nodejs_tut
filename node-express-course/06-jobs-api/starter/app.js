@@ -7,6 +7,7 @@ const authRouter = require("./routes/auth");
 const jobsRouter = require("./routes/jobs");
 const connectDB = require("./db/connect");
 const cookieParser = require("cookie-parser");
+const Jobs = require("./models/Job");
 
 // error handler
 const notFoundMiddleware = require("./middleware/not-found");
@@ -34,6 +35,7 @@ const port = process.env.PORT || 3000;
 const start = async () => {
   try {
     await connectDB(process.env.MONGO_URI);
+    // await Jobs.deleteMany()
     app.listen(port, () =>
       console.log(`Server is listening on port ${port}...`)
     );
