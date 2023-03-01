@@ -10,7 +10,7 @@ const cookieParser = require("cookie-parser");
 const Jobs = require("./models/Job");
 
 // error handler
-const notFoundMiddleware = require("./middleware/not-found");
+const notFoundMiddleware = require("./errors/not-found");
 const errorHandlerMiddleware = require("./middleware/error-handler");
 const authMiddleware = require("./middleware/authentication");
 
