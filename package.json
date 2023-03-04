@@ -1,6 +1,10 @@
 {
   "dependencies": {
     "cookie-parser": "^1.4.6",
-    "isemail": "^3.2.0"
+    "cors": "^2.8.5",
+    "express-rate-limit": "^6.7.0",
+    "helmet": "^6.0.1",
+    "isemail": "^3.2.0",
+    "xss-clean": "^0.1.1"
   }
 }
