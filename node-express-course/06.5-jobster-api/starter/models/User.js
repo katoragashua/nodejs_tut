@@ -1,29 +1,43 @@
 const mongoose = require('mongoose')
 const bcrypt = require('bcryptjs')
 const jwt = require('jsonwebtoken')
+const Isemail = require("isemail")
 
 const UserSchema = new mongoose.Schema({
   name: {
     type: String,
-    required: [true, 'Please provide name'],
+    required: [true, "Please provide name"],
     maxlength: 50,
     minlength: 3,
   },
   email: {
     type: String,
-    required: [true, 'Please provide email'],
-    match: [
-      /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
-      'Please provide a valid email',
-    ],
-    unique: true,
+    required: [true, "An email is required to continue."],
+    maxlength: [50, "Email must not exceed 50 characters"],
+    minlength: [3, "Email must not not be less than 3 characters"],
+    unique: [true],
+    lowercase: true,
+    trim: true,
+    validate: [(val) => Isemail.validate(val), "Enter a valid email address."],
   },
   password: {
     type: String,
-    required: [true, 'Please provide password'],
+    required: [true, "Please provide password"],
     minlength: 6,
   },
-})
+  lastName: {
+    type: String,
+    trim: true,
+    default: "Lastname",
+    maxlength: 20,
+  },
+  location: {
+    type: String,
+    trim: true,
+    default: "My City",
+    maxlength: 20,
+  },
+});
 
 UserSchema.pre('save', async function () {
   const salt = await bcrypt.genSalt(10)
