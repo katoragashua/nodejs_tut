@@ -30,8 +30,11 @@ const login = async (req, res) => {
   if (!isPasswordCorrect) {
     throw new UnauthenticatedError("Invalid Credentials");
   }
+
+  console.log(user);
   // compare password
   const token = user.createJWT();
+  console.log(token);
   res.status(StatusCodes.OK).json({
     user: {
       email: user.email,
@@ -50,25 +53,21 @@ const updateUser = async (req, res) => {
   if (!email || !name || !lastName || !location) {
     throw new BadRequestError("Please provide all values.");
   }
-
-  // const user = await User.findOne({_id: userId})
-  // console.log(user);
   const user = await User.findOneAndUpdate({ _id: userId }, req.body, {
     new: true,
     runValidators: true,
   });
 
-  // console.log(user)
-  // const token = await user.createJWT();
-  // res.status(StatusCodes.OK).json({
-  //   user: {
-  //     email: user.email,
-  //     lastname: user.lastname,
-  //     location: user.location,
-  //     name: user.name,
-  //     token,
-  //   },
-  // });
+  const token = await user.createJWT();
+  res.status(StatusCodes.OK).json({
+    user: {
+      email: user.email,
+      lastname: user.lastname,
+      location: user.location,
+      name: user.name,
+      token,
+    },
+  });
 };
 
 module.exports = {
