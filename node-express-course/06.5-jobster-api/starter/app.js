@@ -13,13 +13,16 @@ const express = require("express");
 const app = express();
 
 const connectDB = require("./db/connect");
-const {authenticateUser, testUser} = require("./middleware/authentication");
+const { authenticateUser, testUser } = require("./middleware/authentication");
 // routers
 const authRouter = require("./routes/auth");
 const jobsRouter = require("./routes/jobs");
 // error handler
 const notFoundMiddleware = require("./middleware/not-found");
 const errorHandlerMiddleware = require("./middleware/error-handler");
+
+// This is for the rate limiter
+app.set("trust proxy", 1);
 
 app.use(express.static(path.resolve(__dirname, "./client/build")));
 app.use(express.json());
