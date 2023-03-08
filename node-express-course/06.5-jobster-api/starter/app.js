@@ -13,7 +13,7 @@ const express = require("express");
 const app = express();
 
 const connectDB = require("./db/connect");
-const authenticateUser = require("./middleware/authentication");
+const {authenticateUser, testUser} = require("./middleware/authentication");
 // routers
 const authRouter = require("./routes/auth");
 const jobsRouter = require("./routes/jobs");
