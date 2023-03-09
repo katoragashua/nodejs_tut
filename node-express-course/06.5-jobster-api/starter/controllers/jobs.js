@@ -2,11 +2,11 @@ const Job = require("../models/Job");
 const { StatusCodes } = require("http-status-codes");
 const { BadRequestError, NotFoundError } = require("../errors");
 const User = require("../models/User");
+const mongoose = require("mongoose");
+const moment = require("moment");
 
 const getAllJobs = async (req, res) => {
   const { search, status, jobType, sort, location } = req.query;
-  console.log(req.query);
-
   const queryObject = {
     createdBy: req.user.userId,
   };
@@ -47,9 +47,11 @@ const getAllJobs = async (req, res) => {
 
   result = result.skip(skip).limit(limit);
   const jobs = await result;
-  const totalJobs = await Job.countDocuments(queryObject)
-  const numOfPages = Math.ceil(totalJobs /limit)
-  res.status(StatusCodes.OK).json({ jobs, count: jobs.length, totalJobs, numOfPages });
+  const totalJobs = await Job.countDocuments(queryObject);
+  const numOfPages = Math.ceil(totalJobs / limit);
+  res
+    .status(StatusCodes.OK)
+    .json({ jobs, count: jobs.length, totalJobs, numOfPages });
 };
 
 const getJob = async (req, res) => {
@@ -70,7 +72,6 @@ const getJob = async (req, res) => {
 
 const createJob = async (req, res) => {
   req.body.createdBy = req.user.userId;
-  console.log(req.body);
   const job = await Job.create(req.body);
   res.status(StatusCodes.CREATED).json({ job });
 };
@@ -112,12 +113,27 @@ const deleteJob = async (req, res) => {
   res.status(StatusCodes.OK).send();
 };
 
-const showStats = async (req, res)=>  (
+const showStats = async (req, res) => {
+  let stats = await Job.aggregate([
+    { $match: { createdBy: mongoose.Types.ObjectId(req.user.userId) } },
+    { $group: { _id: "$status", count: { $sum: 1 } } },
+  ]);
+
+  stats = stats.reduce((acc, curr) => {
+    const { _id: title, count } = curr;
+    console.log(acc, curr);
+    acc[title] = count;
+    return acc;
+  }, {});
+
+  console.log(stats);
+  console.log(req.user);
+
   res.status(StatusCodes.OK).json({
     defaultStats: {},
-    monthlyApplications: []
-  })
-)
+    monthlyApplications: [],
+  });
+};
 
 module.exports = {
   createJob,
@@ -125,5 +141,5 @@ module.exports = {
   getAllJobs,
   updateJob,
   getJob,
-  showStats
+  showStats,
 };

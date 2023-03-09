@@ -12,7 +12,7 @@ const {
 } = require("../controllers/jobs");
 
 router.route("/").post(testUser, createJob).get(getAllJobs);
-router.get("/stats", showStats)
+router.route("/stats").get(showStats)
 
 router
   .route("/:id")

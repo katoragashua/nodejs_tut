@@ -2,7 +2,7 @@ require("dotenv").config();
 require("express-async-errors");
 const path = require("path");
 const User = require("./models/User");
-const Jobs = require("./models/Job");
+const Job = require("./models/Job");
 const jobsData = require("./jobsData.json");
 
 // extra security packages
@@ -50,6 +50,7 @@ const start = async () => {
   try {
     await connectDB(process.env.MONGO_URI);
     // await User.deleteMany()
+    // await Job.deleteMany()
     app.listen(port, () =>
       console.log(`Server is listening on port ${port}...`)
     );

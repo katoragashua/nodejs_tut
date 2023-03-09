@@ -21,8 +21,8 @@ const authenticateUser = async (req, res, next) => {
 };
 
 const testUser = async (req, res, next) => {
-  if(req.user.userId === "6408879dcacc285690177297") {
-    throw new BadRequestError("Test User. Read only.")
+  if (req.user.userId === "6409e8f57946ae18405e2989") {
+    throw new BadRequestError("Test User. Read only.");
   }
   next()
 };
