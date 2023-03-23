@@ -3,6 +3,7 @@ const { Schema } = mongoose;
 const Isemail = require("isemail");
 const bcrypt = require("bcryptjs");
 
+// User Schema
 const UserSchema = new Schema({
   name: {
     type: String,
@@ -13,11 +14,12 @@ const UserSchema = new Schema({
   },
   email: {
     type: String,
-    required: [true, "You must enter an email"],
+    required: true,
+    unique: true,
+    validate: [(val) => Isemail.validate(val), "Enter a valid email address."],
     trim: true,
-    unique: [true, "Email already signed up."],
-    validate: [(val) => Isemail.validate(val), "Please enter a valid email."],
     lowercase: true,
+    minlength: [6, "Email must not not be less than 6 characters."],
   },
   password: {
     type: String,
@@ -27,16 +29,17 @@ const UserSchema = new Schema({
   },
   role: {
     type: String,
-    required: true,
     enum: ["admin", "user"],
-    default: "user"
-  }
+    default: "user",
+  },
 });
 
+// Hashing passwords before saving them in the database
 UserSchema.pre("save", async function (next) {
   const salt = await bcrypt.genSalt(10);
   this.password = await bcrypt.hash(this.password, salt);
   next();
 });
+
 
 module.exports = mongoose.model("User", UserSchema);
