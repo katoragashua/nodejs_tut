@@ -5,6 +5,7 @@ const fileUpload = require("express-fileupload");
 const cookieParser = require("cookie-parser");
 const express = require("express");
 const xss = require("xss-clean");
+const cors = require("cors")
 const cloudinary = require("cloudinary"); // For Uploading images to the cloud
 const helmet = require("helmet");
 const mongoose = require("mongoose");
@@ -21,6 +22,7 @@ const User = require("./models/User");
 app.use(morgan("tiny"));
 app.use(express.json());
 app.use(cookieParser(process.env.JWT_SECRET))
+app.use(cors())
 
 // Security middlewares
 app.use(helmet());
