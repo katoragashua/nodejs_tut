@@ -4,6 +4,9 @@ const CustomError = require("../errors/index");
 
 const getAllUsers = async (req, res) => {
   console.log(req.user);
+//   if(!req.user) {
+//     throw new CustomError.UnauthenticatedError("Login required.")
+//   }
   const users = await User.find({ role: "user" }).select("-password");
   res.status(StatusCodes.OK).json(users);
 };
