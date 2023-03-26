@@ -5,7 +5,7 @@ const fileUpload = require("express-fileupload");
 const cookieParser = require("cookie-parser");
 const express = require("express");
 const xss = require("xss-clean");
-const cors = require("cors")
+const cors = require("cors");
 const cloudinary = require("cloudinary"); // For Uploading images to the cloud
 const helmet = require("helmet");
 const mongoose = require("mongoose");
@@ -15,20 +15,25 @@ const notFound = require("./middleware/not-found");
 const errorHandler = require("./middleware/error-handler");
 const app = express();
 const connectDB = require("./db/connect");
-const authRouter = require("./routes/authRoutes");
 const User = require("./models/User");
+
+// Routers
+const authRouter = require("./routes/authRoutes");
+const userRouter = require("./routes/userRoutes");
+const authenticateUser = require("./middleware/authentication");
 
 // Middlewares
 app.use(morgan("tiny"));
 app.use(express.json());
-app.use(cookieParser(process.env.JWT_SECRET))
-app.use(cors())
+app.use(cookieParser(process.env.JWT_SECRET));
+app.use(cors());
 
 // Security middlewares
 app.use(helmet());
 
 // Auth Routes middleware
 app.use("/api/v1/auth", authRouter);
+app.use("/api/v1/users/", userRouter);
 
 app.get("/", (req, res) => {
   res.send("<h1>E-Commerce App</h1>");
@@ -37,7 +42,7 @@ app.get("/", (req, res) => {
 app.get("/api/v1/", (req, res) => {
   console.log(req.signedCookies);
   res.send("<h1>E-Commerce API Version 1</h1>");
-})
+});
 
 app.use(notFound);
 app.use(errorHandler);
