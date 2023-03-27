@@ -13,10 +13,16 @@ const {
   updateUserPassword,
 } = require("../controllers/userControllers");
 
-router.get("/", authenticateUser, authorizePermissions, getAllUsers);
-router.get("/showMe", getCurrentUser);
-router.patch("/updateUser", updateUser);
-router.patch("/updatePassword", updateUserPassword);
+// The authorizePermissions function is invoked and arguments are passed to it as seen below.
+router.get(
+  "/",
+  authenticateUser,
+  authorizePermissions("admin", "owner"),
+  getAllUsers
+);
+router.get("/showMe", authenticateUser, getCurrentUser);
+router.patch("/updateUserPassword", authenticateUser, updateUserPassword);
+router.patch("/updateUser", authenticateUser, updateUser);
 router.get("/:id", authenticateUser, getSingleUser);
 
 module.exports = router;

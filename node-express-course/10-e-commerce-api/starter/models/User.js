@@ -36,10 +36,12 @@ const UserSchema = new Schema({
 
 // Hashing passwords before saving them in the database
 UserSchema.pre("save", async function (next) {
-  const salt = await bcrypt.genSalt(10);
-  this.password = await bcrypt.hash(this.password, salt);
+  console.log("Hello world!");
+  if (this.isModified("password")) {
+    const salt = await bcrypt.genSalt(10);
+    this.password = await bcrypt.hash(this.password, salt);
+  }
   next();
 });
-
 
 module.exports = mongoose.model("User", UserSchema);

@@ -18,24 +18,16 @@ const authenticateUser = async (req, res, next) => {
   next();
 };
 
-const authorizePermissions = async (req, res, next) => {
-  const token = req.signedCookies.jwt;
-  if (!token) {
-    throw new CustomError.UnauthenticatedError("Login required.");
-  }
-  console.log(token);
-  const decoded = await utilFuncs.verifyToken(token, process.env.JWT_SECRET);
-  if (!decoded) {
-    // res.user = null
-    // or
-    throw new CustomError.UnauthenticatedError("Login required.");
-  }
-  const { role } = decoded;
-  const isAdmin = role;
-  if (isAdmin !== "admin") {
-    throw new CustomError.UnauthorizedError("Not authorized.");
-  }
-  next();
+// The function is passed a rest parameter as an a parameter which takes an array of values and is invoked in the userRoute using any number of arguments. This arguments are recieved and assigned to the roles and  further used in the returned function in authorize Permissions below.
+const authorizePermissions = (...roles) => {
+  // console.log(roles);
+  // The function below is now used as the callback function that accepts req, res and next
+  return (req, res, next) => {
+    if (roles.includes(req.user.roles)) {
+      next();
+    }
+    throw new CustomError.UnauthorizedError("Unauthorized request.")
+  };
 };
 
 module.exports = { authenticateUser, authorizePermissions };

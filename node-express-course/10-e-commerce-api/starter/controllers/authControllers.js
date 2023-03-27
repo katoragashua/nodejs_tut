@@ -26,7 +26,7 @@ const register = async (req, res) => {
   // Creating the JWT token
   const tokenUser = utilFuncs.tokenUser(user);
   console.log(tokenUser);
-  const token = await utilFuncs.createToken(tokenUser);
+  const token = await utilFuncs.createToken(user);
   // Creating cookies
   utilFuncs.setCookies(res,token)
   res.status(StatusCodes.CREATED).json({ user: tokenUser, token });
@@ -56,7 +56,7 @@ const login = async (req, res) => {
   const tokenUser = utilFuncs.tokenUser(user);
   console.log(tokenUser);
   // Signing a JWT token
-  const token = await utilFuncs.createToken(tokenUser);
+  const token = await utilFuncs.createToken(user);
 
   // Creating cookies
   utilFuncs.setCookies(res, token);
