@@ -23,10 +23,10 @@ const authorizePermissions = (...roles) => {
   // console.log(roles);
   // The function below is now used as the callback function that accepts req, res and next
   return (req, res, next) => {
-    if (roles.includes(req.user.roles)) {
-      next();
+    if (!roles.includes(req.user.role)) {
+      throw new CustomError.UnauthorizedError("Unauthorized request.")
     }
-    throw new CustomError.UnauthorizedError("Unauthorized request.")
+    next();
   };
 };
 

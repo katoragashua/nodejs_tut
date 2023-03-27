@@ -3,6 +3,7 @@ const { StatusCodes } = require("http-status-codes");
 const CustomError = require("../errors/index");
 const utilFuncs = require("../utils/index");
 const bcrypt = require("bcryptjs");
+const checkPermissions = require("../utils/checkPermissions");
 
 const getAllUsers = async (req, res) => {
   console.log(req.user);
@@ -16,11 +17,11 @@ const getAllUsers = async (req, res) => {
 const getSingleUser = async (req, res) => {
   const { id: userID } = req.params;
   const user = await User.findById({ _id: userID }).select("-password");
-  console.log(typeof user._id);
   if (!user) {
     throw new CustomError.NotFoundError("User not found.");
   }
-
+  console.log(user._id);
+  checkPermissions(req.user.userId, user._id);
   res.status(StatusCodes.OK).json(user);
 };
 
