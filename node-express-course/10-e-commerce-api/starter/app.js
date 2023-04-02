@@ -21,6 +21,7 @@ const User = require("./models/User");
 const authRouter = require("./routes/authRoutes");
 const userRouter = require("./routes/userRoutes");
 const productRouter = require("./routes/productRoutes");
+const reviewRouter = require("./routes/reviewRoutes");
 const authenticateUser = require("./middleware/authentication");
 
 // Middlewares
@@ -28,8 +29,8 @@ app.use(morgan("tiny"));
 app.use(express.json());
 app.use(cookieParser(process.env.JWT_SECRET));
 app.use(cors());
-app.use(fileUpload())
-app.use(express.static("./public"))
+app.use(fileUpload());
+app.use(express.static("./public"));
 
 // Security middlewares
 app.use(helmet());
@@ -38,6 +39,7 @@ app.use(helmet());
 app.use("/api/v1/auth", authRouter);
 app.use("/api/v1/users/", userRouter);
 app.use("/api/v1/products", productRouter);
+app.use("/api/v1/reviews", reviewRouter);
 
 app.get("/", (req, res) => {
   res.send("<h1>E-Commerce App</h1>");

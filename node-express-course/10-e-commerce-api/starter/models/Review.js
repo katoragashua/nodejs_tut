@@ -21,11 +21,13 @@ const ReviewSchema = new Schema(
       maxlength: 200,
     },
     user: {
-      type: String,
+      type: mongoose.Types.ObjectId,
+      ref: "User",
       required: true,
     },
     product: {
-      type: String,
+      type: mongoose.Types.ObjectId,
+      ref: "Product",
       required: true,
     },
   },
