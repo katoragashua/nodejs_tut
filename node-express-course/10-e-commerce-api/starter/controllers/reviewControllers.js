@@ -5,7 +5,10 @@ const Review = require("../models/Review");
 const utilFuncs = require("../utils/index");
 
 const getAllReviews = async (req, res) => {
-  const reviews = await Review.find({});
+  // The populate method allows us to reference documents in other collections. For example if you want more info about the product, you can chain the populate method as seen below
+  const reviews = await Review.find({})
+    .populate({ path: "product", select: "name price company" })
+    .populate({ path: "user", select: "name" });
   res.status(StatusCodes.OK).json({ reviews, count: reviews.length });
 };
 
@@ -13,7 +16,9 @@ const getSingleReview = async (req, res) => {
   const { id: reviewId } = req.params;
   const review = await Review.findOne({ _id: reviewId });
   if (!review) {
-    throw new CustomError.NotFoundError(`Product ${reviewId} does not exist.`);
+    throw new CustomError.NotFoundError(
+      `Review with id ${reviewId} does not exist.`
+    );
   }
 
   res.status(StatusCodes.OK).json(review);
@@ -45,9 +50,24 @@ const createReview = async (req, res) => {
   res.status(StatusCodes.CREATED).json(review);
 };
 
-
 const updateReview = async (req, res) => {
-  res.status(StatusCodes.OK).json("Update review");
+  const { id: reviewId } = req.params;
+  const { rating, title, comment } = req.body;
+  const review = await Review.findOne({ _id: reviewId });
+  if (!review) {
+    throw new CustomError.NotFoundError(
+      `Review with id ${reviewId} not found.`
+    );
+  }
+
+  utilFuncs.checkPermissions(req.user, review.user);
+  review.rating = rating;
+  review.title = title;
+  review.comment = comment;
+  await review.save();
+  res
+    .status(StatusCodes.OK)
+    .json({ msg: "Review updated successfully.", review });
 };
 
 const deleteReview = async (req, res) => {
@@ -63,10 +83,17 @@ const deleteReview = async (req, res) => {
   res.status(StatusCodes.OK).json({ msg: "Review deleted successfully." });
 };
 
+const getSingleProductReviews = async (req, res) => {
+  const { id: productId } = req.params;
+  const reviews = await Review.find({ product: productId });
+  res.status(StatusCodes.OK).json({reviews, count: reviews.length});
+};
+
 module.exports = {
   getAllReviews,
   getSingleReview,
   createReview,
   updateReview,
   deleteReview,
+  getSingleProductReviews,
 };

@@ -67,7 +67,22 @@ const ProductSchema = new Schema(
       ref: "User"
     },
   },
-  { timestamps: true }
+  { timestamps: true, toJSON: {virtuals: true}, toObject: {virtuals: true} }
 );
+
+ProductSchema.virtual("reviews", {
+  ref: "Review",
+  localField: "_id", // Here we are looking for what connects them. i.e., the reviews and product
+  foreignField: "product",
+  justOne: false,
+  // match: {rating: {$lte: 3}}, //This matches products by rating. i.e., less than or equal 5
+  // match: {rating: 5}, //Matches for rating = 5
+});
+
+// This hook removes all reviews associated with a product when it is removed
+ProductSchema.pre("remove", async function(next) {
+  await this.model("Review").deleteMany({product: this._id})
+  next()
+})
 
 module.exports = mongoose.model("Product", ProductSchema);

@@ -12,7 +12,8 @@ const getAllProducts = async (req, res) => {
 
 const getSingleProduct = async (req, res) => {
   const { id: productId } = req.params;
-  const product = await Product.findOne({ _id: productId });
+  // Note that for virtuals, we do not need a path in the populate method.
+  const product = await Product.findOne({ _id: productId }).populate("reviews");
   if (!product) {
     throw new CustomError.NotFoundError(
       `Product with id ${productId} not found`
