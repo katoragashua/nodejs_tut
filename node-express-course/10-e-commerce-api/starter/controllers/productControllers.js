@@ -4,7 +4,7 @@ const Product = require("../models/Product");
 const path = require("path");
 
 const getAllProducts = async (req, res) => {
-  const products = await Product.find({});
+  const products = await Product.find({}).populate("reviews");
   res
     .status(StatusCodes.OK)
     .json({ product: products, count: products.length });

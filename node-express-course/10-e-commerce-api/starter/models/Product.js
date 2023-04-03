@@ -12,7 +12,7 @@ const ProductSchema = new Schema(
     price: {
       type: Number,
       required: [true, "Please enter products price."],
-      default: 0
+      default: 0,
     },
     description: {
       type: String,
@@ -23,7 +23,7 @@ const ProductSchema = new Schema(
     image: {
       type: String,
       required: true,
-      default: "/uploads/example.jpg"
+      default: "/uploads/example.jpg",
     },
     category: {
       type: String,
@@ -35,8 +35,8 @@ const ProductSchema = new Schema(
       required: true,
       enum: {
         values: ["ikea", "liddy", "marcos"],
-        message: `{VALUE} is not supported.`
-      }
+        message: `{VALUE} is not supported.`,
+      },
     },
     colors: {
       type: [String],
@@ -54,20 +54,23 @@ const ProductSchema = new Schema(
     inventory: {
       type: Number,
       required: true,
-      default: 15
+      default: 15,
     },
     averageRating: {
       type: Number,
-      required: true,
-      default: 0
+      default: 0,
+    },
+    numOfReviews: {
+      type: Number,
+      default: 0,
     },
     user: {
       type: mongoose.Types.ObjectId,
       required: true,
-      ref: "User"
+      ref: "User",
     },
   },
-  { timestamps: true, toJSON: {virtuals: true}, toObject: {virtuals: true} }
+  { timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } }
 );
 
 ProductSchema.virtual("reviews", {
@@ -80,9 +83,9 @@ ProductSchema.virtual("reviews", {
 });
 
 // This hook removes all reviews associated with a product when it is removed
-ProductSchema.pre("remove", async function(next) {
-  await this.model("Review").deleteMany({product: this._id})
-  next()
-})
+ProductSchema.pre("remove", async function (next) {
+  await this.model("Review").deleteMany({ product: this._id });
+  next();
+});
 
 module.exports = mongoose.model("Product", ProductSchema);

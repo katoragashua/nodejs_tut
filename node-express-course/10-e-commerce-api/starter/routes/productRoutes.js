@@ -14,7 +14,10 @@ const {
   deleteProduct,
 } = require("../controllers/productControllers");
 
-const {getSingleProductReviews} = require("../controllers/reviewControllers")
+const {
+  getSingleProductReviews,
+  reviewStats,
+} = require("../controllers/reviewControllers");
 
 router.get("/", getAllProducts);
 router.post(
@@ -47,6 +50,7 @@ router.delete(
   deleteProduct
 );
 
+router.get("/:id/reviewStats", reviewStats)
 router.get("/:id/reviews", getSingleProductReviews);
 
 module.exports = router;

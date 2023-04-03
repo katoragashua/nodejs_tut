@@ -3,6 +3,7 @@ const { StatusCodes } = require("http-status-codes");
 const Product = require("../models/Product");
 const Review = require("../models/Review");
 const utilFuncs = require("../utils/index");
+const { default: mongoose } = require("mongoose");
 
 const getAllReviews = async (req, res) => {
   // The populate method allows us to reference documents in other collections. For example if you want more info about the product, you can chain the populate method as seen below
@@ -86,8 +87,18 @@ const deleteReview = async (req, res) => {
 const getSingleProductReviews = async (req, res) => {
   const { id: productId } = req.params;
   const reviews = await Review.find({ product: productId });
-  res.status(StatusCodes.OK).json({reviews, count: reviews.length});
+  res.status(StatusCodes.OK).json({ reviews, count: reviews.length });
 };
+
+const reviewStats = async (req, res) => {
+  const {id: productId} = req.params
+  let stats = await Review.aggregate([
+    {$match: {product: mongoose.Types.ObjectId(productId)}},
+    {$group: {_id: null, averageRating: {$avg: "$rating"}, numberOfReviews: {$sum: 1}},}
+  ])
+
+  res.status(StatusCodes.OK).json(stats)
+}
 
 module.exports = {
   getAllReviews,
@@ -96,4 +107,5 @@ module.exports = {
   updateReview,
   deleteReview,
   getSingleProductReviews,
+  reviewStats
 };
