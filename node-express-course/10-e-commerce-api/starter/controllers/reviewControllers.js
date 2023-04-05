@@ -91,14 +91,32 @@ const getSingleProductReviews = async (req, res) => {
 };
 
 const reviewStats = async (req, res) => {
-  const {id: productId} = req.params
+  const { id: productId } = req.params;
   let stats = await Review.aggregate([
-    {$match: {product: mongoose.Types.ObjectId(productId)}},
-    {$group: {_id: null, averageRating: {$avg: "$rating"}, numberOfReviews: {$sum: 1}},}
-  ])
+    { $match: { product: mongoose.Types.ObjectId(productId) } },
+    {
+      $group: {
+        _id: null,
+        averageRating: { $avg: "$rating" },
+        numberOfReviews: { $sum: 1 },
+      },
+    },
+  ]);
 
-  res.status(StatusCodes.OK).json(stats)
-}
+  stats = stats.reduce((acc, cur) => {
+    const { averageRating, numberOfReviews } = cur
+    acc.averageRating = averageRating
+    acc.numOfReviews = numberOfReviews
+    return acc
+  },{
+    averageRating: 0,
+    numOfReviews: 0
+  })
+
+  // stats[0].averageRating = Math.round(stats[0].averageRating);
+  // stats[0].averageRating = stats[0].averageRating.toFixed(2);
+  res.status(StatusCodes.OK).json(stats);
+};
 
 module.exports = {
   getAllReviews,
@@ -107,5 +125,5 @@ module.exports = {
   updateReview,
   deleteReview,
   getSingleProductReviews,
-  reviewStats
+  reviewStats,
 };

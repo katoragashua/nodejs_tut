@@ -16,6 +16,7 @@ const errorHandler = require("./middleware/error-handler");
 const app = express();
 const connectDB = require("./db/connect");
 const User = require("./models/User");
+const Review = require("./models/Review");
 
 // Routers
 const authRouter = require("./routes/authRoutes");
@@ -60,6 +61,7 @@ const start = async () => {
     // Connect to Database
     await connectDB(process.env.MONGO_URI);
     // await User.deleteMany();
+    // await Review.deleteMany();
     app.listen(port, () => {
       console.log(`App listening on port ${port}`);
     });

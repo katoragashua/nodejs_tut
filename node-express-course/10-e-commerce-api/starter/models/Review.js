@@ -53,13 +53,20 @@ ReviewSchema.statics.calculateAverageRating = async function (productId) {
     const product = await this.model("Product").findOneAndUpdate(
       { _id: productId },
       {
-        averageRating: Math.ceil(stats[0]?.averageRating || 0), //using optional chaining
-        numOfReviews: stats[0]?.numOfReviews || 0,
-      }, {new: true, runValidators: true}
+        averageRating: Math.ceil(stats.length ? stats[0].averageRating : 0), //using tenary operation
+        numOfReviews: stats[0]?.numOfReviews || 0, //using optional chaining
+      },
+      { new: true, runValidators: true }
     );
   }catch(error) {
     console.log(error)
   }
+  // try {
+  //   const user = await this.model("User").find({});
+  //   console.log(user);
+  // } catch (error) {
+  //   console.log(error)
+  // }
 };
 
 ReviewSchema.post("save", async function () {
