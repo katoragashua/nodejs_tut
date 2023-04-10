@@ -58,11 +58,12 @@ ReviewSchema.statics.calculateAverageRating = async function (productId) {
       },
       { new: true, runValidators: true }
     );
+    
   }catch(error) {
     console.log(error)
   }
   // try {
-  //   const user = await this.model("User").find({});
+  //   const user = await this.model("Order").find({});
   //   console.log(user);
   // } catch (error) {
   //   console.log(error)
