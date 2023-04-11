@@ -18,6 +18,8 @@ const connectDB = require("./db/connect");
 const User = require("./models/User");
 const Review = require("./models/Review");
 const Order = require("./models/Order");
+const rateLimiter = require("express-rate-limit");
+const sanitize = require("express-mongo-sanitize");
 
 // Routers
 const authRouter = require("./routes/authRoutes");
@@ -27,11 +29,21 @@ const reviewRouter = require("./routes/reviewRoutes");
 const authenticateUser = require("./middleware/authentication");
 const orderRouter = require("./routes/orderRoutes");
 
+app.set("trust proxy", 1);
+app.use(
+  rateLimiter({
+    windowMs: 15 * 60 * 1000,
+    max: 60,
+  })
+);
+app.use(cors());
+app.use(sanitize());
+app.use(xss());
+
 // Middlewares
 app.use(morgan("tiny"));
 app.use(express.json());
 app.use(cookieParser(process.env.JWT_SECRET));
-app.use(cors());
 app.use(fileUpload());
 app.use(express.static("./public"));
 
