@@ -1,6 +1,8 @@
 require('dotenv').config();
 require('express-async-errors');
 // express
+const mongoose = require("mongoose")
+mongoose.set("strictQuery", false);
 
 const express = require('express');
 const app = express();
@@ -13,6 +15,7 @@ const helmet = require('helmet');
 const xss = require('xss-clean');
 const cors = require('cors');
 const mongoSanitize = require('express-mongo-sanitize');
+const User = require('./models/User');
 
 // database
 const connectDB = require('./db/connect');
@@ -52,13 +55,18 @@ app.use('/api/v1/products', productRouter);
 app.use('/api/v1/reviews', reviewRouter);
 app.use('/api/v1/orders', orderRouter);
 
+app.get("/", (req, res) => {
+  res.send("<h1>Auth Workflow</h1>")
+})
+
 app.use(notFoundMiddleware);
 app.use(errorHandlerMiddleware);
 
 const port = process.env.PORT || 5000;
 const start = async () => {
   try {
-    await connectDB(process.env.MONGO_URL);
+    await connectDB(process.env.MONGO_URI);
+    // await User.deleteMany()
     app.listen(port, () =>
       console.log(`Server is listening on port ${port}...`)
     );
