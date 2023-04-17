@@ -1,9 +1,20 @@
-const emailObject = {
-  from: '"Fred Foo 👻" <foo@example.com>', // sender address
-  to: "bar@example.com, baz@example.com", // list of receivers
-  subject: "Hello ✔", // Subject line
-  text: "Hello world?", // plain text body
-  html: "<b>Hello world?</b>", // html body
+const sendEmail = require("./sendEmail");
+
+const sendVerificationEmail = async ({
+  name,
+  email,
+  verificationToken,
+  origin,
+}) => {
+  const verificationLink = `${origin}/user/verify-email?token=${verificationToken}&email=${email}`
+  const message = `<p>Please click <a href=${verificationLink}>here</a> to verify your account</p>`;
+  return sendEmail({
+    to: email,
+    subject: "Verification confirmation",
+    html: `<h2>Hello, ${name}!</h2> 
+      ${message}
+    `,
+  });
 };
 
-module.export = emailObject
+module.exports = sendVerificationEmail;

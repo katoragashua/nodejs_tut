@@ -8,6 +8,8 @@ const crypto = require("crypto");
 const nodemailer = require("nodemailer");
 const utilFuncs = require("../utils/index");
 const sgMail = require("@sendgrid/mail");
+const { log } = require("console");
+const Token = require("../models/Token");
 
 // We can create a comparePassword function here as seen below or we can use methods in the Schema
 const comparePassword = async (password, userPassword) => {
@@ -39,13 +41,20 @@ const register = async (req, res) => {
     role,
     verificationToken,
   });
-
-  await utilFuncs.sendEmail();
+  const tokenUser = createTokenUser(user);
+  attachCookiesToResponse({ res, user: tokenUser });
+  const origin = "http://localhost:3000";
+  console.log(req.headers);
+  await utilFuncs.sendVerificationEmail({
+    name: user.name,
+    email: user.email,
+    verificationToken: user.verificationToken,
+    origin,
+  });
   res.status(StatusCodes.CREATED).json({
     user,
     verificationToken: user.verificationToken,
     msg: "Success! Check your email to verify your account.",
-    info
   });
 };
 
@@ -72,7 +81,17 @@ const login = async (req, res) => {
     );
   }
 
-  res.status(StatusCodes.OK).json({ user });
+  let refreshToken = ""
+
+  refreshToken = crypto.randomBytes(40).toString("hex")
+  let ip = req.ip
+  let userAgent = req.get("user-agent") // or req.headers["user-agent"]
+
+  // console.log(req.get("user-agent"))
+  // console.log(req.ip);
+  const userToken = {refreshToken, ip, userAgent, user: user._id}
+  const token = await Token.create(userToken)
+  res.status(StatusCodes.OK).json({ user, token });
 };
 
 const verifyEmail = async (req, res) => {
