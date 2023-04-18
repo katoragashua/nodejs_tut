@@ -16,6 +16,7 @@ const xss = require('xss-clean');
 const cors = require('cors');
 const mongoSanitize = require('express-mongo-sanitize');
 const User = require('./models/User');
+const Token = require("./models/Token");
 
 // database
 const connectDB = require('./db/connect');
@@ -68,6 +69,7 @@ const start = async () => {
   try {
     await connectDB(process.env.MONGO_URI);
     // await User.deleteMany()
+    // await Token.deleteMany()
     app.listen(port, () =>
       console.log(`Server is listening on port ${port}...`)
     );

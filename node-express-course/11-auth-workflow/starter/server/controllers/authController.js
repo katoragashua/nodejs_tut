@@ -81,17 +81,34 @@ const login = async (req, res) => {
     );
   }
 
-  let refreshToken = ""
+  let refreshToken = "";
 
-  refreshToken = crypto.randomBytes(40).toString("hex")
-  let ip = req.ip
-  let userAgent = req.get("user-agent") // or req.headers["user-agent"]
+  // Since we don't want to keep creating token documents on every login. We can check if a token exists already where the user property is set to the users _id property (user._id). If it does, we check is the existingToken' isValid property is set to true andset the refresh token declared above to the existingToken.refreshToken. Else we throw an error if the existingToken' isValid property is set to false
+  const existingToken = await Token.findOne({ user: user._id });
+  if (existingToken) {
+    const { isValid } = existingToken;
+    if (!isValid) {
+      throw new CustomError.UnauthenticatedError("Not authenticated.");
+    }
+    refreshToken = existingToken.refreshToken;
+    const tokenUser = createTokenUser(user);
+    attachCookiesToResponse({ res, user: tokenUser, refreshToken });
+    res.status(StatusCodes.OK).json({ user });
+    return;
+  }
+
+  refreshToken = crypto.randomBytes(40).toString("hex");
+  let ip = req.ip;
+  let userAgent = req.get("user-agent"); // or req.headers["user-agent"]
 
   // console.log(req.get("user-agent"))
   // console.log(req.ip);
-  const userToken = {refreshToken, ip, userAgent, user: user._id}
-  const token = await Token.create(userToken)
-  res.status(StatusCodes.OK).json({ user, token });
+  const userToken = { refreshToken, ip, userAgent, user: user._id };
+  // const token = await Token.create(userToken)
+  await Token.create(userToken);
+  const tokenUser = createTokenUser(user);
+  attachCookiesToResponse({ res, user: tokenUser, refreshToken });
+  res.status(StatusCodes.OK).json({ user });
 };
 
 const verifyEmail = async (req, res) => {
@@ -129,11 +146,18 @@ const verifyEmail = async (req, res) => {
 // }
 
 const logout = async (req, res) => {
-  res.cookie("token", "logout", {
-    httpOnly: true,
-    expires: new Date(Date.now() + 1000),
-  });
-  res.status(StatusCodes.OK).json({ msg: "user logged out!" });
+  // res.cookie("token", "logout", {
+  //   httpOnly: true,
+  //   expires: new Date(Date.now() + 1000),
+  // });
+  const token = await Token.findOne({ user: req.user.userId });
+  if (!token) {
+    throw new CustomError.BadRequestError("User not found");
+  }
+  await token.remove();
+  res.clearCookie("accessToken");
+  res.clearCookie("refreshToken");
+  res.status(StatusCodes.OK).json({ msg: "user logged out!", });
 };
 
 module.exports = {
