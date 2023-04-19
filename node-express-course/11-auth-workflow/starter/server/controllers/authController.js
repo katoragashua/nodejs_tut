@@ -146,10 +146,6 @@ const verifyEmail = async (req, res) => {
 // }
 
 const logout = async (req, res) => {
-  // res.cookie("token", "logout", {
-  //   httpOnly: true,
-  //   expires: new Date(Date.now() + 1000),
-  // });
   const token = await Token.findOne({ user: req.user.userId });
   if (!token) {
     throw new CustomError.BadRequestError("User not found");
@@ -157,7 +153,71 @@ const logout = async (req, res) => {
   await token.remove();
   res.clearCookie("accessToken");
   res.clearCookie("refreshToken");
-  res.status(StatusCodes.OK).json({ msg: "user logged out!", });
+  // res.cookie("accessToken", "logout", {
+  //   httpOnly: true,
+  //   expires: new Date(Date.now() + 1000),
+  // });
+
+  // res.cookie("refreshToken", "logout", {
+  //   httpOnly: true,
+  //   expires: new Date(Date.now() + 1000),
+  // });
+  res.status(StatusCodes.OK).json({ msg: "user logged out!" });
+};
+
+const forgotPassword = async (req, res) => {
+  const { email } = req.body;
+  if (!email) {
+    throw new CustomError.BadRequestError("Please enter an email.");
+  }
+  const user = await User.findOne({ email: email });
+  // Here we do not throw an error if the user does not exist because we don't wan't an attacker to keep trying different emails.
+  if (user) {
+    const expirationTime = 1000 * 60 * 60; // One hour
+    const origin = "http://localhost:3000";
+    const passwordToken = crypto.randomBytes(40).toString("hex");
+    const passwordTokenExpirationDate = new Date(Date.now() + expirationTime);
+    await utilFuncs.sendResetEmail({
+      name: user.name,
+      email: user.email,
+      passwordToken,
+      origin,
+    });
+
+    // We hash the passwordToken when we save in database.
+    user.passwordToken = utilFuncs.hashString(passwordToken);
+    user.passwordTokenExpirationDate = passwordTokenExpirationDate;
+    await user.save();
+  }
+
+  res
+    .status(StatusCodes.OK)
+    .json({ msg: "Please check you email address for a password reset link." });
+};
+
+const resetPassword = async (req, res) => {
+  const { email, token, password } = req.body;
+  if (!email || !token || !password) {
+    throw new CustomError.BadRequestError("");
+  }
+  const user = await User.findOne({ email: email });
+  if (!user) {
+    throw new CustomError.NotFoundError("User not found.");
+  }
+  // Note that the passwordToken in the database is the hashed one. So we compare hash incoming token coming from the body and compare them.
+  if (user.passwordToken !== utilFuncs.hashString(token)) {
+    throw new CustomError.UnauthenticatedError("Invalid credentials.");
+  }
+
+  if (!(user.passwordTokenExpirationDate > new Date())) {
+    throw new CustomError.BadRequestError("Password token expired.");
+  }
+
+  user.password = password;
+  user.passwordToken = null;
+  user.passwordTokenExpirationDate = null;
+  await user.save();
+  res.status(StatusCodes.OK).json({ msg: "Password reset." });
 };
 
 module.exports = {
@@ -165,4 +225,6 @@ module.exports = {
   login,
   logout,
   verifyEmail,
+  forgotPassword,
+  resetPassword,
 };
